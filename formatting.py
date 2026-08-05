@@ -185,7 +185,6 @@ def build_free_pick_message(sport_code, away, home, picked, price, probability) 
         SEP,
         "⚠️ Not financial advice. Bet responsibly.",
         f"👻 Follow {config.SOCIAL_HANDLE} for daily picks",
-        SEP,
     ])
 
 
@@ -202,17 +201,16 @@ def build_free_result_message(win: bool, sport_code, away, home, picked, today: 
         SEP,
         f"📊 Today: {today['wins']}-{today['losses']}",
         f"📈 Overall: {overall['wins']}-{overall['losses']} — {win_pct(overall['wins'], overall['losses'])}%",
-        SEP,
     ])
 
 
 # ── VIP pick / result ─────────────────────────────────────────────────
-def build_vip_pick_message(sport_code, away, home, picked, price, probability, edge, bet_size) -> str:
+def build_vip_pick_message(sport_code, away, home, picked, price, probability, edge) -> str:
     info = config.SPORT_INFO[sport_code]
     emoji = info["emoji"]
     return "\n".join([
         SEP,
-        "👻 PHANTOM PICKS — VIP EARLY ACCESS",
+        "👻 PHANTOM PICKS — VIP",
         SEP,
         f"📅 Date: {_today_str()}",
         f"{emoji} Sport: {info['name']}",
@@ -222,10 +220,9 @@ def build_vip_pick_message(sport_code, away, home, picked, price, probability, e
         f"📊 Model Probability: {fmt_num(probability)}%",
         f"📈 Edge: +{fmt_num(edge)}pp",
         SEP,
-        f"💰 Recommended Bet: ${fmt_num(bet_size)}",
+        "💰 Recommended Bet: 1 unit",
         SEP,
         "⚠️ Not financial advice. Bet responsibly.",
-        SEP,
     ])
 
 
@@ -248,5 +245,4 @@ def build_vip_result_message(win: bool, sport_code, away, home, picked, amount, 
         f"📈 Running Record: {overall['wins']}-{overall['losses']} — {win_pct(overall['wins'], overall['losses'])}%",
         SEP,
         f"🧠 Notes: {notes}",
-        SEP,
     ])

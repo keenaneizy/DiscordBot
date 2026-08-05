@@ -11,9 +11,9 @@ HELP_TEXT = """\
 Posts a formatted free pick to #free-daily-picks.
 Example: `!freepick MLB "New York Yankees" "Boston Red Sox" "Boston Red Sox" 62 68`
 
-`!vippick [sport] [away team] [home team] [picked team] [kalshi price] [model probability] [edge] [bet size]`
-Posts a formatted VIP pick to #vip-picks.
-Example: `!vippick MLB "New York Yankees" "Boston Red Sox" "Boston Red Sox" 62 68 6 50`
+`!vippick [sport] [away team] [home team] [picked team] [kalshi price] [model probability] [edge]`
+Posts a formatted VIP pick to #vip-picks. Recommended bet is always shown as "1 unit" (see `!setunits`/Unit size note below).
+Example: `!vippick MLB "New York Yankees" "Boston Red Sox" "Boston Red Sox" 62 68 6`
 
 **Results & record** *(admin only unless noted)*
 `!result [W|L] [sport] [away team] [home team] [picked team] [amount|auto] [notes]`

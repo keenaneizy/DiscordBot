@@ -71,8 +71,7 @@ class Picks(commands.Cog):
     @is_admin_or_owner()
     @commands.guild_only()
     async def vippick(self, ctx: commands.Context, sport: str, away_team: str, home_team: str,
-                       picked_team: str, kalshi_price: float, model_probability: float, edge: float,
-                       bet_size: float):
+                       picked_team: str, kalshi_price: float, model_probability: float, edge: float):
         sport_code = resolve_sport(sport)
         if sport_code is None:
             await ctx.send(f"⚠️ Unknown sport `{sport}`. Use MLB, NFL, NBA, \"College Football\", or \"College Basketball\".")
@@ -88,7 +87,7 @@ class Picks(commands.Cog):
             return
 
         message = build_vip_pick_message(sport_code, away_team, home_team, picked_team,
-                                          kalshi_price, model_probability, edge, bet_size)
+                                          kalshi_price, model_probability, edge)
         await channel.send(message)
 
         data = self.store.load()
