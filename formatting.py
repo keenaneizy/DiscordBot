@@ -24,6 +24,11 @@ def fmt_money(n) -> str:
     return f"{float(n):,.2f}"
 
 
+def fmt_units(n) -> str:
+    """Always 2 decimal places for the pinned record's units line: 0.694915 -> '0.69'."""
+    return f"{float(n):.2f}"
+
+
 def win_pct(wins: int, losses: int) -> float:
     total = wins + losses
     if total == 0:
@@ -144,7 +149,7 @@ def build_record_block(data: dict) -> str:
     units = data["units"]
     pnl = data["pnl"]
 
-    units_str = f"{'+' if units >= 0 else ''}{fmt_num(units)}"
+    units_str = f"{'+' if units >= 0 else ''}{fmt_units(units)}"
     pnl_str = f"{'+' if pnl >= 0 else '-'}${fmt_money(abs(pnl))}"
 
     lines = [
