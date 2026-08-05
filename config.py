@@ -19,6 +19,12 @@ WINIBLE_LINK = os.getenv("WINIBLE_LINK", "https://winible.com")
 
 SOCIAL_HANDLE = "@phantompicks"
 
+# Dollar value of 1 "unit" — used to auto-calculate P&L and units change from
+# the Kalshi price when !result is run with `auto` as the amount. Assumes a
+# flat 1-unit stake on every pick. Change via the UNIT_SIZE env var any time
+# (e.g. as your bankroll grows) without needing a code change.
+UNIT_SIZE = float(os.getenv("UNIT_SIZE", "200"))
+
 # ── Category names (created in this exact order) ─────────────────────
 CAT_INFO = "📋 INFORMATION"
 CAT_RECORD = "📊 MODEL RECORD"

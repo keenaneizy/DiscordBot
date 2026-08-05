@@ -18,6 +18,13 @@ the HIGH/MEDIUM buckets. If no match is found (e.g. the pick was posted
 before a bot restart cleared pending picks, or it was a free-only pick),
 the confidence buckets are simply left untouched — overall/sport/today
 records are still updated regardless.
+
+Note on the `amount` argument: pass a dollar figure to book it manually, or
+pass the literal word `auto` to have the bot calculate both the dollar P&L
+and the units change itself from the Kalshi price stored on the matching
+pending pick, assuming a flat 1-unit stake (config.UNIT_SIZE dollars) on
+every game — see units.py for the payout math. `auto` only works when a
+matching pending pick with a saved price exists.
 """
 import datetime
 
@@ -29,6 +36,7 @@ from checks import is_admin_or_owner
 from data_store import DataStore
 from formatting import build_free_result_message, build_vip_result_message, build_record_block, fmt_num
 from sports import resolve_sport
+from units import auto_profit, auto_units_change
 
 
 class Results(commands.Cog):
@@ -69,7 +77,7 @@ class Results(commands.Cog):
     @is_admin_or_owner()
     @commands.guild_only()
     async def result(self, ctx: commands.Context, outcome: str, sport: str, away_team: str,
-                      home_team: str, picked_team: str, amount: float, notes: str):
+                      home_team: str, picked_team: str, amount: str, notes: str):
         outcome = outcome.strip().upper()
         if outcome not in ("W", "L"):
             await ctx.send("⚠️ Result must be `W` or `L`.")
@@ -81,18 +89,43 @@ class Results(commands.Cog):
             return
 
         win = outcome == "W"
-        amount = abs(amount)
         bucket_key = "wins" if win else "losses"
 
         data = self.store.load()
         data = self._roll_today(data)
 
+        # Pull the matching pending pick (if any) *before* deciding the
+        # amount, since auto-calculation needs its stored Kalshi price.
+        pending_idx = self._find_pending(data, sport_code, away_team, home_team, picked_team)
+        pending_pick = data["pending_picks"][pending_idx] if pending_idx is not None else None
+
+        units_change = None  # only set when auto-calculating from a Kalshi price
+
+        if amount.strip().lower() in ("auto", "a", "-"):
+            if pending_pick is None or pending_pick.get("price") is None:
+                await ctx.send(
+                    "⚠️ Can't auto-calculate — no matching pending pick with a saved Kalshi price was "
+                    "found (sport/teams/picked team have to match the original !freepick or !vippick "
+                    "exactly). Enter the dollar amount manually instead of `auto`."
+                )
+                return
+            price = pending_pick["price"]
+            amount_value = auto_profit(win, price)
+            units_change = auto_units_change(win, price)
+        else:
+            try:
+                amount_value = abs(float(amount))
+            except ValueError:
+                await ctx.send("⚠️ Amount must be a number, or type `auto` to calculate it from the Kalshi price.")
+                return
+
         data["overall"][bucket_key] += 1
         data["sports"][sport_code][bucket_key] += 1
         data["today"][bucket_key] += 1
-        data["pnl"] += amount if win else -amount
+        data["pnl"] += amount_value if win else -amount_value
+        if units_change is not None:
+            data["units"] += units_change
 
-        pending_idx = self._find_pending(data, sport_code, away_team, home_team, picked_team)
         if pending_idx is not None:
             pick = data["pending_picks"].pop(pending_idx)
             if pick.get("confidence") in ("HIGH", "MEDIUM"):
@@ -103,7 +136,7 @@ class Results(commands.Cog):
         free_msg = build_free_result_message(win, sport_code, away_team, home_team, picked_team,
                                               data["today"], data["overall"])
         vip_msg = build_vip_result_message(win, sport_code, away_team, home_team, picked_team,
-                                            amount, data["today"], data["overall"], notes)
+                                            amount_value, data["today"], data["overall"], notes)
 
         free_results_ch = discord.utils.get(ctx.guild.text_channels, name=config.CH_FREE_RESULTS)
         vip_results_ch = discord.utils.get(ctx.guild.text_channels, name=config.CH_VIP_RESULTS)

@@ -42,6 +42,10 @@ class Picks(commands.Cog):
             await ctx.send(f"⚠️ Unknown sport `{sport}`. Use MLB, NFL, NBA, \"College Football\", or \"College Basketball\".")
             return
 
+        if not (0 < kalshi_price < 100):
+            await ctx.send("⚠️ Kalshi price must be between 1 and 99 (cents).")
+            return
+
         channel = self._find_channel(ctx.guild, config.CH_FREE_PICKS)
         if channel is None:
             await ctx.send(f"⚠️ Couldn't find #{config.CH_FREE_PICKS}. Run `!setup` first.")
@@ -55,6 +59,7 @@ class Picks(commands.Cog):
         data["pending_picks"].append({
             "sport": sport_code, "away": away_team, "home": home_team,
             "picked": picked_team, "confidence": None, "type": "free",
+            "price": kalshi_price,
         })
         self.store.save(data)
 
@@ -79,6 +84,10 @@ class Picks(commands.Cog):
             await ctx.send("⚠️ Confidence must be `HIGH` or `MEDIUM`.")
             return
 
+        if not (0 < kalshi_price < 100):
+            await ctx.send("⚠️ Kalshi price must be between 1 and 99 (cents).")
+            return
+
         channel = self._find_channel(ctx.guild, config.CH_VIP_PICKS)
         if channel is None:
             await ctx.send(f"⚠️ Couldn't find #{config.CH_VIP_PICKS}. Run `!setup` first.")
@@ -93,6 +102,7 @@ class Picks(commands.Cog):
         data["pending_picks"].append({
             "sport": sport_code, "away": away_team, "home": home_team,
             "picked": picked_team, "confidence": confidence, "type": "vip",
+            "price": kalshi_price,
         })
         self.store.save(data)
 

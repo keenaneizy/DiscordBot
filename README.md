@@ -108,10 +108,10 @@ have one pinned message.
 |---|---|---|
 | `!freepick [sport] [away] [home] [picked] [kalshi price] [probability]` | admin | Posts a formatted pick to #free-daily-picks |
 | `!vippick [sport] [away] [home] [picked] [kalshi price] [probability] [edge] [HIGH\|MEDIUM] [bet size] [reason]` | admin | Posts a formatted pick to #vip-picks |
-| `!result [W\|L] [sport] [away] [home] [picked] [amount] [notes]` | admin | Posts to #free-results + #vip-results, updates the pinned record |
+| `!result [W\|L] [sport] [away] [home] [picked] [amount\|auto] [notes]` | admin | Posts to #free-results + #vip-results, updates the pinned record |
 | `!updaterecord [W\|L] [sport]` | admin | Manually adjusts overall + sport record only |
 | `!setrecord [W-L]` | admin | Manually overwrites the overall record, e.g. `!setrecord 45-30` |
-| `!setunits [+/-X]` | admin | Sets the units total shown in the pinned record |
+| `!setunits [+/-X]` | admin | Manually overwrites the units total shown in the pinned record |
 | `!record` | anyone | Replies with the current model record block |
 | `!setup` | admin | Re-runs full server provisioning |
 | `!help` | anyone | Lists all commands with syntax/examples |
@@ -129,10 +129,24 @@ reason / result notes. Example:
 
 !vippick NFL "Buffalo Bills" "Miami Dolphins" "Buffalo Bills" 58 65 7 HIGH 75 "Dolphins missing 2 starting OL, model sees pressure rate spiking"
 
-!result W MLB "New York Yankees" "Boston Red Sox" "Boston Red Sox" 46 "Bullpen shut the door in the 8th, exactly as modeled"
+!result W MLB "New York Yankees" "Boston Red Sox" "Boston Red Sox" auto "Bullpen shut the door in the 8th, exactly as modeled"
 ```
 
 Sport aliases accepted: `MLB`, `NFL`, `NBA`, `CFB`/`"College Football"`, `CBB`/`"College Basketball"` (edit `SPORT_ALIASES` in `config.py` to add more).
+
+**Automatic P&L / units from the Kalshi price:** for the `[amount]` slot on
+`!result`, type a dollar figure yourself to book it manually, or type the
+word `auto` to have the bot calculate both the dollar profit/loss *and* the
+units change itself, from the Kalshi price you gave when you posted that
+pick with `!freepick`/`!vippick`. This assumes a flat 1-unit stake on every
+game — 1 unit = `UNIT_SIZE` dollars (defaults to $200, set via the
+`UNIT_SIZE` environment variable). The math: a win pays out `UNIT_SIZE *
+(100 - price) / price` dollars (`(100-price)/price` units); a loss forfeits
+the whole `UNIT_SIZE` stake (exactly -1 unit). `auto` only works when the
+sport/away/home/picked team match a pick you posted exactly — if there's no
+match (e.g. a manual result for a pick made before this feature, or a typo
+in the team names), enter the dollar amount yourself instead and adjust
+units separately with `!setunits` if needed.
 
 **Confidence-tier tracking:** the model record's HIGH/MEDIUM confidence
 buckets only update when `!result` can match the game to a pick that was
