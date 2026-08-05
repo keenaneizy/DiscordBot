@@ -147,10 +147,15 @@ class ServerSetup(commands.Cog, name="ServerSetup"):
                                position: int, overwrites: dict | None = None):
         channel = discord.utils.get(category.text_channels, name=name)
         if channel is None:
-            channel = await guild.create_text_channel(
-                name, category=category, position=position,
-                overwrites=overwrites, reason="Phantom Picks setup",
-            )
+            # discord.py's create_text_channel rejects overwrites=None outright
+            # (it wants the kwarg omitted, not passed as None) — only include it
+            # when we actually have channel-specific overwrites to apply. With no
+            # explicit overwrites, a channel created under a category inherits
+            # the category's permissions automatically.
+            create_kwargs = {"category": category, "position": position, "reason": "Phantom Picks setup"}
+            if overwrites is not None:
+                create_kwargs["overwrites"] = overwrites
+            channel = await guild.create_text_channel(name, **create_kwargs)
             log.info(f"Created channel: #{name}")
         else:
             if channel.category_id != category.id:
