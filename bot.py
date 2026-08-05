@@ -38,27 +38,40 @@ INITIAL_COGS = [
 ]
 
 
+async def _provision_guild_safely(guild: discord.Guild):
+    setup_cog = bot.get_cog("ServerSetup")
+    if setup_cog is None:
+        log.error("ServerSetup cog failed to load — skipping auto-provisioning.")
+        return
+    try:
+        await setup_cog.provision_guild(guild)
+    except discord.Forbidden:
+        log.error(
+            f"Missing permissions to provision '{guild.name}'. "
+            "Make sure the bot's role has Manage Roles/Channels and is above "
+            "Free Member / Phantom Pro in the role list."
+        )
+    except Exception:
+        log.exception(f"Failed to provision guild {guild.name}")
+
+
 @bot.event
 async def on_ready():
     log.info(f"Logged in as {bot.user} (ID: {bot.user.id})")
 
-    setup_cog = bot.get_cog("ServerSetup")
     for guild in bot.guilds:
-        if setup_cog is None:
-            log.error("ServerSetup cog failed to load — skipping auto-provisioning.")
-            break
-        try:
-            await setup_cog.provision_guild(guild)
-        except discord.Forbidden:
-            log.error(
-                f"Missing permissions to provision '{guild.name}'. "
-                "Make sure the bot's role has Manage Roles/Channels and is above "
-                "Free Member / Phantom Pro in the role list."
-            )
-        except Exception:
-            log.exception(f"Failed to provision guild {guild.name}")
+        await _provision_guild_safely(guild)
 
     log.info("Phantom Picks is online and ready.")
+
+
+@bot.event
+async def on_guild_join(guild: discord.Guild):
+    # Fires when the bot is invited to a server while already running —
+    # on_ready only runs once per connection, so this is what provisions a
+    # brand-new server without needing a manual restart or !setup.
+    log.info(f"Joined new guild: {guild.name} ({guild.id})")
+    await _provision_guild_safely(guild)
 
 
 async def main():
