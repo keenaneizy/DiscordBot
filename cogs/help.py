@@ -17,7 +17,7 @@ Example: `!vippick MLB "New York Yankees" "Boston Red Sox" "Boston Red Sox" 62 6
 
 **Results & record** *(admin only unless noted)*
 `!result [W|L] [sport] [away team] [home team] [picked team] [amount|auto] [notes]`
-Posts the result to #free-results and #vip-results, and updates the pinned model record.
+Posts the result to #free-results if that pick came from `!freepick`, or #vip-results if it came from `!vippick` (posts to both only if the pick's origin can't be matched), and updates the pinned model record.
 For `[amount]`, either type a dollar figure yourself, **or type `auto`** to have the bot calculate both the $ profit/loss and the units change automatically from that pick's Kalshi price (assumes a flat 1-unit stake on every game — see `!help` unit size note below). `auto` only works if the sport/teams/picked team match a pick you posted with `!freepick`/`!vippick` exactly.
 Example (auto): `!result W MLB "New York Yankees" "Boston Red Sox" "Boston Red Sox" auto "Bullpen shut the door in the 8th"`
 Example (manual): `!result W MLB "New York Yankees" "Boston Red Sox" "Boston Red Sox" 46 "Bullpen shut the door in the 8th"`

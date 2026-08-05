@@ -108,7 +108,7 @@ have one pinned message.
 |---|---|---|
 | `!freepick [sport] [away] [home] [picked] [kalshi price] [probability]` | admin | Posts a formatted pick to #free-daily-picks |
 | `!vippick [sport] [away] [home] [picked] [kalshi price] [probability] [edge]` | admin | Posts a formatted pick to #vip-picks (recommended bet always shown as "1 unit") |
-| `!result [W\|L] [sport] [away] [home] [picked] [amount\|auto] [notes]` | admin | Posts to #free-results + #vip-results, updates the pinned record |
+| `!result [W\|L] [sport] [away] [home] [picked] [amount\|auto] [notes]` | admin | Posts to #free-results (if from `!freepick`) or #vip-results (if from `!vippick`), updates the pinned record |
 | `!updaterecord [W\|L] [sport]` | admin | Manually adjusts overall + sport record only |
 | `!setrecord [W-L]` | admin | Manually overwrites the overall record, e.g. `!setrecord 45-30` |
 | `!setunits [+/-X]` | admin | Manually overwrites the units total shown in the pinned record |
@@ -213,7 +213,7 @@ Run through this after first deploy:
 - [ ] `!record` responds with the record block (all zeros on a fresh install)
 - [ ] `!freepick MLB "Away Team" "Home Team" "Home Team" 55 60` posts correctly formatted to #free-daily-picks with the ⚾ emoji
 - [ ] `!vippick MLB "Away Team" "Home Team" "Home Team" 55 60 5` posts correctly to #vip-picks
-- [ ] `!result W MLB "Away Team" "Home Team" "Home Team" auto "test"` posts to both #free-results and #vip-results, and the pinned message in #model-record-and-pnl updates (overall record, MLB record, units, and P&L all increment)
+- [ ] `!result W MLB "Away Team" "Home Team" "Home Team" auto "test"` posts to #vip-results only (since the matching pick above was posted with `!vippick`), and the pinned message in #model-record-and-pnl updates (overall record, MLB record, units, and P&L all increment)
 - [ ] As a **non-admin** test account: can post in #free-chat and #member-wins; **cannot** post in #welcome, #unit-sizing-and-responsible-betting, #model-record-and-pnl, #free-daily-picks, #free-results
 - [ ] As that same non-admin account: the **💎 VIP MEMBERS ONLY** category (and its 3 channels) is completely invisible in the channel list
 - [ ] Give that test account the `Phantom Pro` role manually (simulating what Winible will do) — the VIP category should now appear, with read-only access to #vip-picks/#vip-results and full post access to #vip-chat

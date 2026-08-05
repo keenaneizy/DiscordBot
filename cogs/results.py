@@ -1,8 +1,10 @@
 """
 Results cog — score-tracking commands.
 
-!result        posts a result to both public results channels and updates
-               every record bucket (overall, sport, today)
+!result        posts a result to whichever results channel matches the
+               pick's origin (#free-results for a !freepick, #vip-results
+               for a !vippick — both if the origin can't be determined),
+               and updates every record bucket (overall, sport, today)
 !updaterecord  manual overall + sport record correction (no channel post)
 !setrecord     manually overwrite the overall W-L
 !setunits      manually overwrite the units total
@@ -120,17 +122,23 @@ class Results(commands.Cog):
 
         self.store.save(data)
 
-        free_msg = build_free_result_message(win, sport_code, away_team, home_team, picked_team,
-                                              data["today"], data["overall"])
-        vip_msg = build_vip_result_message(win, sport_code, away_team, home_team, picked_team,
-                                            amount_value, data["today"], data["overall"], notes)
+        # Route the result to only the channel matching where the pick
+        # originated — a free pick's result stays in #free-results, a VIP
+        # pick's result stays in #vip-results. If there's no matching pending
+        # pick (origin unknown — e.g. a manual result with no saved price),
+        # post to both as a safe fallback.
+        pick_type = pending_pick.get("type") if pending_pick is not None else None
 
         free_results_ch = discord.utils.get(ctx.guild.text_channels, name=config.CH_FREE_RESULTS)
         vip_results_ch = discord.utils.get(ctx.guild.text_channels, name=config.CH_VIP_RESULTS)
 
-        if free_results_ch:
+        if pick_type in ("free", None) and free_results_ch:
+            free_msg = build_free_result_message(win, sport_code, away_team, home_team, picked_team,
+                                                  data["today"], data["overall"])
             await free_results_ch.send(free_msg)
-        if vip_results_ch:
+        if pick_type in ("vip", None) and vip_results_ch:
+            vip_msg = build_vip_result_message(win, sport_code, away_team, home_team, picked_team,
+                                                amount_value, data["today"], data["overall"], notes)
             await vip_results_ch.send(vip_msg)
 
         await self._refresh_pin(ctx.guild, data)
