@@ -75,5 +75,3 @@ SPORT_INFO = {
 
 # Fixed display order for the model record block
 SPORT_ORDER = ["MLB", "NFL", "NBA", "CFB", "CBB"]
-
-CONFIDENCE_EMOJI = {"HIGH": "⭐", "MEDIUM": "🔵"}

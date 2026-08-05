@@ -56,7 +56,7 @@ def build_welcome_message() -> str:
         "• Community access, including #free-chat and #member-wins\n\n"
         "💎 **PHANTOM PRO (VIP) MEMBERS GET:**\n"
         "• Early access to ALL picks before games start\n"
-        "• Full model data — probability, edge, and confidence tier\n"
+        "• Full model data — probability and edge\n"
         "• Recommended bet sizing on every pick\n"
         "• Detailed result analysis after every game\n"
         "• Private VIP community in #vip-chat\n"
@@ -125,7 +125,7 @@ def build_welcome_dm() -> str:
         "- Community access and member wins channel\n\n"
         "💎 PHANTOM PRO VIP MEMBERS GET:\n"
         "- Early access to ALL picks before games start\n"
-        "- Full model data — probability, edge, confidence tier\n"
+        "- Full model data — probability and edge\n"
         "- Recommended bet sizing on every pick\n"
         "- Detailed result analysis after every game\n"
         "- Private VIP community\n\n"
@@ -140,7 +140,6 @@ def build_welcome_dm() -> str:
 # ── model record ──────────────────────────────────────────────────────
 def build_record_block(data: dict) -> str:
     overall = data["overall"]
-    conf = data["confidence"]
     sports = data["sports"]
     units = data["units"]
     pnl = data["pnl"]
@@ -155,11 +154,6 @@ def build_record_block(data: dict) -> str:
         f"📈 Win Rate: {win_pct(overall['wins'], overall['losses'])}%",
         f"💰 Units: {units_str} units",
         f"💵 P&L: {pnl_str}",
-        SEP,
-        f"⭐ HIGH Confidence: {conf['HIGH']['wins']}-{conf['HIGH']['losses']} — "
-        f"{win_pct(conf['HIGH']['wins'], conf['HIGH']['losses'])}%",
-        f"🔵 MEDIUM Confidence: {conf['MEDIUM']['wins']}-{conf['MEDIUM']['losses']} — "
-        f"{win_pct(conf['MEDIUM']['wins'], conf['MEDIUM']['losses'])}%",
         SEP,
     ]
     for code in config.SPORT_ORDER:
@@ -213,11 +207,9 @@ def build_free_result_message(win: bool, sport_code, away, home, picked, today: 
 
 
 # ── VIP pick / result ─────────────────────────────────────────────────
-def build_vip_pick_message(sport_code, away, home, picked, price, probability, edge,
-                            confidence, bet_size, reason) -> str:
+def build_vip_pick_message(sport_code, away, home, picked, price, probability, edge, bet_size) -> str:
     info = config.SPORT_INFO[sport_code]
     emoji = info["emoji"]
-    conf_emoji = config.CONFIDENCE_EMOJI[confidence]
     return "\n".join([
         SEP,
         "👻 PHANTOM PICKS — VIP EARLY ACCESS",
@@ -230,10 +222,7 @@ def build_vip_pick_message(sport_code, away, home, picked, price, probability, e
         f"📊 Model Probability: {fmt_num(probability)}%",
         f"📈 Edge: +{fmt_num(edge)}pp",
         SEP,
-        f"{conf_emoji} Confidence: {confidence}",
         f"💰 Recommended Bet: ${fmt_num(bet_size)}",
-        SEP,
-        f"🧠 Why: {reason}",
         SEP,
         "⚠️ Not financial advice. Bet responsibly.",
         SEP,

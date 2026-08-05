@@ -58,8 +58,7 @@ class Picks(commands.Cog):
         data = self.store.load()
         data["pending_picks"].append({
             "sport": sport_code, "away": away_team, "home": home_team,
-            "picked": picked_team, "confidence": None, "type": "free",
-            "price": kalshi_price,
+            "picked": picked_team, "type": "free", "price": kalshi_price,
         })
         self.store.save(data)
 
@@ -73,15 +72,10 @@ class Picks(commands.Cog):
     @commands.guild_only()
     async def vippick(self, ctx: commands.Context, sport: str, away_team: str, home_team: str,
                        picked_team: str, kalshi_price: float, model_probability: float, edge: float,
-                       confidence: str, bet_size: float, reason: str):
+                       bet_size: float):
         sport_code = resolve_sport(sport)
         if sport_code is None:
             await ctx.send(f"⚠️ Unknown sport `{sport}`. Use MLB, NFL, NBA, \"College Football\", or \"College Basketball\".")
-            return
-
-        confidence = confidence.strip().upper()
-        if confidence not in ("HIGH", "MEDIUM"):
-            await ctx.send("⚠️ Confidence must be `HIGH` or `MEDIUM`.")
             return
 
         if not (0 < kalshi_price < 100):
@@ -94,15 +88,13 @@ class Picks(commands.Cog):
             return
 
         message = build_vip_pick_message(sport_code, away_team, home_team, picked_team,
-                                          kalshi_price, model_probability, edge, confidence,
-                                          bet_size, reason)
+                                          kalshi_price, model_probability, edge, bet_size)
         await channel.send(message)
 
         data = self.store.load()
         data["pending_picks"].append({
             "sport": sport_code, "away": away_team, "home": home_team,
-            "picked": picked_team, "confidence": confidence, "type": "vip",
-            "price": kalshi_price,
+            "picked": picked_team, "type": "vip", "price": kalshi_price,
         })
         self.store.save(data)
 

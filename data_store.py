@@ -21,17 +21,14 @@ def _default_data() -> dict:
         "overall": {"wins": 0, "losses": 0},
         "units": 0.0,
         "pnl": 0.0,
-        "confidence": {
-            "HIGH": {"wins": 0, "losses": 0},
-            "MEDIUM": {"wins": 0, "losses": 0},
-        },
         "sports": {code: {"wins": 0, "losses": 0} for code in config.SPORT_ORDER},
         # Rolling "today" counter shown in #free-results, reset automatically
         # whenever the calendar date changes.
         "today": {"date": None, "wins": 0, "losses": 0},
         # Picks posted via !freepick / !vippick, kept here just long enough for
-        # !result to look up the confidence tier of the pick it's resolving.
-        # See Results._find_pending() in cogs/results.py.
+        # !result to look up the Kalshi price of the pick it's resolving (for
+        # auto P&L/units calculation). See Results._find_pending() in
+        # cogs/results.py.
         "pending_picks": [],
         "pinned_record": {"channel_id": None, "message_id": None},
         "welcome_posted": False,

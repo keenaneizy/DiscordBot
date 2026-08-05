@@ -107,7 +107,7 @@ have one pinned message.
 | Command | Who | What it does |
 |---|---|---|
 | `!freepick [sport] [away] [home] [picked] [kalshi price] [probability]` | admin | Posts a formatted pick to #free-daily-picks |
-| `!vippick [sport] [away] [home] [picked] [kalshi price] [probability] [edge] [HIGH\|MEDIUM] [bet size] [reason]` | admin | Posts a formatted pick to #vip-picks |
+| `!vippick [sport] [away] [home] [picked] [kalshi price] [probability] [edge] [bet size]` | admin | Posts a formatted pick to #vip-picks |
 | `!result [W\|L] [sport] [away] [home] [picked] [amount\|auto] [notes]` | admin | Posts to #free-results + #vip-results, updates the pinned record |
 | `!updaterecord [W\|L] [sport]` | admin | Manually adjusts overall + sport record only |
 | `!setrecord [W-L]` | admin | Manually overwrites the overall record, e.g. `!setrecord 45-30` |
@@ -121,13 +121,13 @@ have one pinned message.
 access to an account that isn't a full server admin).
 
 **Quoting:** wrap any argument containing spaces in double quotes — team
-names, `"College Football"` / `"College Basketball"`, and the VIP pick
-reason / result notes. Example:
+names, `"College Football"` / `"College Basketball"`, and the `!result`
+notes. Example:
 
 ```
 !freepick MLB "New York Yankees" "Boston Red Sox" "Boston Red Sox" 62 68
 
-!vippick NFL "Buffalo Bills" "Miami Dolphins" "Buffalo Bills" 58 65 7 HIGH 75 "Dolphins missing 2 starting OL, model sees pressure rate spiking"
+!vippick NFL "Buffalo Bills" "Miami Dolphins" "Buffalo Bills" 58 65 7 75
 
 !result W MLB "New York Yankees" "Boston Red Sox" "Boston Red Sox" auto "Bullpen shut the door in the 8th, exactly as modeled"
 ```
@@ -148,13 +148,10 @@ match (e.g. a manual result for a pick made before this feature, or a typo
 in the team names), enter the dollar amount yourself instead and adjust
 units separately with `!setunits` if needed.
 
-**Confidence-tier tracking:** the model record's HIGH/MEDIUM confidence
-buckets only update when `!result` can match the game to a pick that was
-posted via `!vippick` (which is the only command that takes a confidence
-tier). If you run `!result` for a game with no matching pending `!vippick`
-pick (e.g. a free-only pick, or the bot restarted and lost the in-memory
-match), the overall/sport/today records still update — only the confidence
-buckets are skipped.
+The model record tracks overall record and a breakdown by sport (MLB, NFL,
+NBA, College Football, College Basketball). There's no confidence-tier or
+free-vs-VIP breakdown — every result counts toward the same overall/sport
+tallies regardless of which channel the pick came from.
 
 ---
 
@@ -215,8 +212,8 @@ Run through this after first deploy:
 - [ ] `!help` responds with the full command list
 - [ ] `!record` responds with the record block (all zeros on a fresh install)
 - [ ] `!freepick MLB "Away Team" "Home Team" "Home Team" 55 60` posts correctly formatted to #free-daily-picks with the ⚾ emoji
-- [ ] `!vippick MLB "Away Team" "Home Team" "Home Team" 55 60 5 HIGH 50 "test"` posts correctly to #vip-picks
-- [ ] `!result W MLB "Away Team" "Home Team" "Home Team" 50 "test"` posts to both #free-results and #vip-results, and the pinned message in #model-record-and-pnl updates (record, MLB record, and HIGH confidence record all increment)
+- [ ] `!vippick MLB "Away Team" "Home Team" "Home Team" 55 60 5 50` posts correctly to #vip-picks
+- [ ] `!result W MLB "Away Team" "Home Team" "Home Team" auto "test"` posts to both #free-results and #vip-results, and the pinned message in #model-record-and-pnl updates (overall record, MLB record, units, and P&L all increment)
 - [ ] As a **non-admin** test account: can post in #free-chat and #member-wins; **cannot** post in #welcome, #unit-sizing-and-responsible-betting, #model-record-and-pnl, #free-daily-picks, #free-results
 - [ ] As that same non-admin account: the **💎 VIP MEMBERS ONLY** category (and its 3 channels) is completely invisible in the channel list
 - [ ] Give that test account the `Phantom Pro` role manually (simulating what Winible will do) — the VIP category should now appear, with read-only access to #vip-picks/#vip-results and full post access to #vip-chat

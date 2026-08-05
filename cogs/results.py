@@ -2,22 +2,11 @@
 Results cog — score-tracking commands.
 
 !result        posts a result to both public results channels and updates
-               every record bucket (overall, sport, today, and — if it can
-               be correlated to a pick posted via !vippick — confidence tier)
+               every record bucket (overall, sport, today)
 !updaterecord  manual overall + sport record correction (no channel post)
 !setrecord     manually overwrite the overall W-L
 !setunits      manually overwrite the units total
 !record        anyone can ask for the current record block
-
-Note on confidence tracking: !result's syntax (per spec) doesn't take a
-confidence argument, and only !vippick picks have a confidence tier at all
-(!freepick picks don't). So when !result runs, it looks for a matching entry
-in data["pending_picks"] (same sport/away/home/picked, case-insensitive) to
-find out if this game's pick had a confidence tier, and only then updates
-the HIGH/MEDIUM buckets. If no match is found (e.g. the pick was posted
-before a bot restart cleared pending picks, or it was a free-only pick),
-the confidence buckets are simply left untouched — overall/sport/today
-records are still updated regardless.
 
 Note on the `amount` argument: pass a dollar figure to book it manually, or
 pass the literal word `auto` to have the bot calculate both the dollar P&L
@@ -127,9 +116,7 @@ class Results(commands.Cog):
             data["units"] += units_change
 
         if pending_idx is not None:
-            pick = data["pending_picks"].pop(pending_idx)
-            if pick.get("confidence") in ("HIGH", "MEDIUM"):
-                data["confidence"][pick["confidence"]][bucket_key] += 1
+            data["pending_picks"].pop(pending_idx)
 
         self.store.save(data)
 
