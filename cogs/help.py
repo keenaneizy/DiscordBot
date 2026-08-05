@@ -33,6 +33,8 @@ Example: `!setunits +12.5`
 
 `!record` — **anyone** can use this. Posts the current model record block.
 
+`!pending` — lists every pick still awaiting a `!result` (sport, teams, picked team, price, free/VIP) — useful for checking exactly what the bot has stored if `auto` can't find a match.
+
 **Setup** *(admin only)*
 `!setup` — (re)creates all categories/channels/roles/permissions and pinned messages.
 

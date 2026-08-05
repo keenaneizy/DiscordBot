@@ -113,6 +113,7 @@ have one pinned message.
 | `!setrecord [W-L]` | admin | Manually overwrites the overall record, e.g. `!setrecord 45-30` |
 | `!setunits [+/-X]` | admin | Manually overwrites the units total shown in the pinned record |
 | `!record` | anyone | Replies with the current model record block |
+| `!pending` | admin | Lists picks still awaiting a `!result`, with the exact team names/price the bot has stored |
 | `!setup` | admin | Re-runs full server provisioning |
 | `!help` | anyone | Lists all commands with syntax/examples |
 

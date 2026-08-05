@@ -212,6 +212,27 @@ class Results(commands.Cog):
         data = self.store.load()
         await ctx.send(build_record_block(data))
 
+    # ── !pending ─────────────────────────────────────────────────────────
+    @commands.command(name="pending")
+    @is_admin_or_owner()
+    @commands.guild_only()
+    async def pending(self, ctx: commands.Context):
+        """Lists picks posted with !freepick/!vippick that haven't had a
+        !result posted for them yet — useful for checking exactly what the
+        bot has stored (team names, price, type) when `auto` can't find a match."""
+        data = self.store.load()
+        picks = data["pending_picks"]
+        if not picks:
+            await ctx.send("No pending picks waiting for a result.")
+            return
+        lines = ["**Pending picks awaiting !result:**"]
+        for p in picks:
+            lines.append(
+                f"- [{p.get('type', '?').upper()}] {p['sport']} — {p['away']} @ {p['home']} "
+                f"— picked **{p['picked']}** @ {p.get('price', '?')}¢"
+            )
+        await ctx.send("\n".join(lines))
+
     # ── error handling for every command in this cog ───────────────────
     async def cog_command_error(self, ctx: commands.Context, error):
         if isinstance(error, commands.CheckFailure):
