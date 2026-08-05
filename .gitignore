@@ -1,0 +1,9 @@
+.env
+__pycache__/
+*.pyc
+.venv/
+venv/
+
+# Live bot data — don't commit real record data, keep the folder via .gitkeep
+data/record.json
+data/*.tmp
