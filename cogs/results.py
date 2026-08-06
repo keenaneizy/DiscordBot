@@ -49,13 +49,24 @@ class Results(commands.Cog):
 
     @staticmethod
     def _find_pending(data: dict, sport_code: str, away: str, home: str, picked: str):
-        for i, pick in enumerate(data["pending_picks"]):
+        """Returns the index of the matching pending pick, or None. If more
+        than one entry matches (duplicate posts, or a stale entry left over
+        from before price tracking existed), prefers one that actually has a
+        saved price so `auto` doesn't get shadowed by an unusable older
+        match — falls back to the first match if none have a price."""
+        matches = [
+            i for i, pick in enumerate(data["pending_picks"])
             if (pick["sport"] == sport_code
-                    and pick["away"].lower() == away.lower()
-                    and pick["home"].lower() == home.lower()
-                    and pick["picked"].lower() == picked.lower()):
+                and pick["away"].lower() == away.lower()
+                and pick["home"].lower() == home.lower()
+                and pick["picked"].lower() == picked.lower())
+        ]
+        if not matches:
+            return None
+        for i in matches:
+            if data["pending_picks"][i].get("price") is not None:
                 return i
-        return None
+        return matches[0]
 
     async def _refresh_pin(self, guild: discord.Guild, data: dict):
         setup_cog = self.bot.get_cog("ServerSetup")
@@ -232,6 +243,38 @@ class Results(commands.Cog):
                 f"— picked **{p['picked']}** @ {p.get('price', '?')}¢"
             )
         await ctx.send("\n".join(lines))
+
+    # ── !clearpending ────────────────────────────────────────────────────
+    @commands.command(name="clearpending")
+    @is_admin_or_owner()
+    @commands.guild_only()
+    async def clearpending(self, ctx: commands.Context, sport: str, away_team: str,
+                            home_team: str, picked_team: str):
+        """Removes every pending entry matching sport/away/home/picked — use
+        this to clear out duplicate posts of the same pick, or a stale entry
+        left over from before price tracking existed. Run !pending first to
+        see exactly what's there."""
+        sport_code = resolve_sport(sport)
+        if sport_code is None:
+            await ctx.send(f"⚠️ Unknown sport `{sport}`. Use MLB, NFL, NBA, \"College Football\", or \"College Basketball\".")
+            return
+
+        data = self.store.load()
+        before = len(data["pending_picks"])
+        data["pending_picks"] = [
+            p for p in data["pending_picks"]
+            if not (p["sport"] == sport_code
+                    and p["away"].lower() == away_team.lower()
+                    and p["home"].lower() == home_team.lower()
+                    and p["picked"].lower() == picked_team.lower())
+        ]
+        removed = before - len(data["pending_picks"])
+        self.store.save(data)
+
+        if removed == 0:
+            await ctx.send("No matching pending picks found — nothing removed.")
+        else:
+            await ctx.send(f"🗑️ Removed {removed} matching pending pick(s).")
 
     # ── error handling for every command in this cog ───────────────────
     async def cog_command_error(self, ctx: commands.Context, error):

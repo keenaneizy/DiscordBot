@@ -35,6 +35,8 @@ Example: `!setunits +12.5`
 
 `!pending` — lists every pick still awaiting a `!result` (sport, teams, picked team, price, free/VIP) — useful for checking exactly what the bot has stored if `auto` can't find a match.
 
+`!clearpending [sport] [away team] [home team] [picked team]` — removes every pending entry matching those details. Use this to clear out duplicate posts of the same pick, or a stale/priceless entry. Check `!pending` first to see what's there.
+
 **Setup** *(admin only)*
 `!setup` — (re)creates all categories/channels/roles/permissions and pinned messages.
 
