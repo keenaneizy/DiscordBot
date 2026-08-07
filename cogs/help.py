@@ -7,15 +7,15 @@ HELP_TEXT = """\
 👻 **PHANTOM PICKS — COMMANDS**
 
 **Pick posting** *(admin only)*
-Picks no longer post as individual detailed messages — each one is appended as a single line ("Team ML 1u") to that channel's one running message for the day (a fresh message starts automatically each new date). `kalshi price`/`model probability`/`edge` are still required since the bot needs the price to calculate results later, even though they're not shown on the line.
+Picks no longer post as individual detailed messages — each one is appended as a single line ("Team ML 1u") to that channel's one running message for the day (a fresh message starts automatically each new date). `kalshi price` is still required since the bot needs it to calculate the result later, even though it's not shown on the line.
 
-`!freepick [sport] [away team] [home team] [picked team] [kalshi price] [model probability]`
+`!freepick [sport] [away team] [home team] [picked team] [kalshi price]`
 Adds a line to today's #free-daily-picks message.
-Example: `!freepick MLB "New York Yankees" "Boston Red Sox" "Boston Red Sox" 62 68`
+Example: `!freepick MLB "New York Yankees" "Boston Red Sox" "Boston Red Sox" 62`
 
-`!vippick [sport] [away team] [home team] [picked team] [kalshi price] [model probability] [edge]`
+`!vippick [sport] [away team] [home team] [picked team] [kalshi price]`
 Adds a line to today's #vip-picks message.
-Example: `!vippick MLB "New York Yankees" "Boston Red Sox" "Boston Red Sox" 62 68 6`
+Example: `!vippick MLB "New York Yankees" "Boston Red Sox" "Boston Red Sox" 62`
 
 **Results & record** *(admin only unless noted)*
 `!result [W|L] [sport] [away team] [home team] [picked team] [amount|auto] [notes]`

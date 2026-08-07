@@ -106,8 +106,8 @@ have one pinned message.
 
 | Command | Who | What it does |
 |---|---|---|
-| `!freepick [sport] [away] [home] [picked] [kalshi price] [probability]` | admin | Adds a "Team ML 1u" line to today's running #free-daily-picks message |
-| `!vippick [sport] [away] [home] [picked] [kalshi price] [probability] [edge]` | admin | Adds a "Team ML 1u" line to today's running #vip-picks message |
+| `!freepick [sport] [away] [home] [picked] [kalshi price]` | admin | Adds a "Team ML 1u" line to today's running #free-daily-picks message |
+| `!vippick [sport] [away] [home] [picked] [kalshi price]` | admin | Adds a "Team ML 1u" line to today's running #vip-picks message |
 | `!result [W\|L] [sport] [away] [home] [picked] [amount\|auto] [notes]` | admin | Adds a "Team ML 1u ✅/❌" line to today's running #free-results or #vip-results message (matching the pick's origin), updates the pinned record |
 | `!updaterecord [W\|L] [sport]` | admin | Manually adjusts overall + sport record only |
 | `!setrecord [W-L]` | admin | Manually overwrites the overall record, e.g. `!setrecord 45-30` |
@@ -127,9 +127,9 @@ names, `"College Football"` / `"College Basketball"`, and the `!result`
 notes. Example:
 
 ```
-!freepick MLB "New York Yankees" "Boston Red Sox" "Boston Red Sox" 62 68
+!freepick MLB "New York Yankees" "Boston Red Sox" "Boston Red Sox" 62
 
-!vippick NFL "Buffalo Bills" "Miami Dolphins" "Buffalo Bills" 58 65 7
+!vippick NFL "Buffalo Bills" "Miami Dolphins" "Buffalo Bills" 58
 
 !result W MLB "New York Yankees" "Boston Red Sox" "Boston Red Sox" auto "Bullpen shut the door in the 8th, exactly as modeled"
 ```
@@ -222,7 +222,7 @@ Run through this after first deploy:
 
 - [ ] `!help` responds with the full command list
 - [ ] `!record` responds with the record block (all zeros on a fresh install)
-- [ ] `!vippick MLB "Away Team" "Home Team" "Home Team" 55 60 5` adds a "Home Team ML 1u" line to today's #vip-picks message
+- [ ] `!vippick MLB "Away Team" "Home Team" "Home Team" 55` adds a "Home Team ML 1u" line to today's #vip-picks message
 - [ ] `!result W MLB "Away Team" "Home Team" "Home Team" auto "test"` adds a "Home Team ML 1u ✅" line to today's #vip-results message only (since the matching pick above was posted with `!vippick`), and the pinned message in #model-record-and-pnl updates (overall record, MLB record, units, and P&L all increment)
 - [ ] Post a second `!vippick` for a different game — confirm it adds a second line to the *same* #vip-picks message rather than creating a new one
 - [ ] As a **non-admin** test account: can post in #free-chat and #member-wins; **cannot** post in #welcome, #unit-sizing-and-responsible-betting, #model-record-and-pnl, #free-daily-picks, #free-results

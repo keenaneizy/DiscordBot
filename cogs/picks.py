@@ -8,8 +8,9 @@ or README.md for exact syntax and examples.
 Posting: rather than a detailed one-message-per-pick post, each pick gets
 appended as one line ("Team ML 1u") to that channel's single running
 "today's picks" message — see rollup.py. kalshi_price is still required and
-stored on the pending pick even though it's no longer displayed, since
-!result's `auto` amount needs it to calculate P&L/units.
+stored on the pending pick, since !result's `auto` amount needs it to
+calculate P&L/units — model probability and edge aren't collected at all
+since nothing displays or uses them anymore.
 """
 import discord
 from discord.ext import commands
@@ -43,7 +44,7 @@ class Picks(commands.Cog):
     @is_admin_or_owner()
     @commands.guild_only()
     async def freepick(self, ctx: commands.Context, sport: str, away_team: str, home_team: str,
-                        picked_team: str, kalshi_price: float, model_probability: float):
+                        picked_team: str, kalshi_price: float):
         sport_code = resolve_sport(sport)
         if sport_code is None:
             await ctx.send(f"⚠️ Unknown sport `{sport}`. Use MLB, NFL, NBA, \"College Football\", or \"College Basketball\".")
@@ -75,7 +76,7 @@ class Picks(commands.Cog):
     @is_admin_or_owner()
     @commands.guild_only()
     async def vippick(self, ctx: commands.Context, sport: str, away_team: str, home_team: str,
-                       picked_team: str, kalshi_price: float, model_probability: float, edge: float):
+                       picked_team: str, kalshi_price: float):
         sport_code = resolve_sport(sport)
         if sport_code is None:
             await ctx.send(f"⚠️ Unknown sport `{sport}`. Use MLB, NFL, NBA, \"College Football\", or \"College Basketball\".")
