@@ -16,6 +16,10 @@ and the units change itself from the Kalshi price stored on the matching
 pending pick, assuming a flat 1-unit stake (config.UNIT_SIZE dollars) on
 every game — see units.py for the payout math. `auto` only works when a
 matching pending pick with a saved price exists.
+
+Posting: rather than a detailed one-message-per-result post, each result
+gets appended as one line ("Team ML 1u ✅/❌") to that channel's single
+running "today's results" message — see rollup.py.
 """
 import datetime
 
@@ -25,7 +29,8 @@ from discord.ext import commands
 import config
 from checks import is_admin_or_owner
 from data_store import DataStore
-from formatting import build_free_result_message, build_vip_result_message, build_record_block, fmt_num
+from formatting import build_result_line, build_record_block, fmt_num
+from rollup import append_line
 from sports import resolve_sport
 from units import auto_profit, auto_units_change
 
@@ -131,27 +136,23 @@ class Results(commands.Cog):
         if pending_idx is not None:
             data["pending_picks"].pop(pending_idx)
 
-        self.store.save(data)
-
         # Route the result to only the channel matching where the pick
         # originated — a free pick's result stays in #free-results, a VIP
         # pick's result stays in #vip-results. If there's no matching pending
         # pick (origin unknown — e.g. a manual result with no saved price),
         # post to both as a safe fallback.
         pick_type = pending_pick.get("type") if pending_pick is not None else None
+        result_line = build_result_line(picked_team, win)
 
         free_results_ch = discord.utils.get(ctx.guild.text_channels, name=config.CH_FREE_RESULTS)
         vip_results_ch = discord.utils.get(ctx.guild.text_channels, name=config.CH_VIP_RESULTS)
 
         if pick_type in ("free", None) and free_results_ch:
-            free_msg = build_free_result_message(win, sport_code, away_team, home_team, picked_team,
-                                                  data["today"], data["overall"])
-            await free_results_ch.send(free_msg)
+            await append_line(free_results_ch, data["daily_results"]["free"], "FREE RESULTS", result_line)
         if pick_type in ("vip", None) and vip_results_ch:
-            vip_msg = build_vip_result_message(win, sport_code, away_team, home_team, picked_team,
-                                                amount_value, data["today"], data["overall"], notes)
-            await vip_results_ch.send(vip_msg)
+            await append_line(vip_results_ch, data["daily_results"]["vip"], "VIP RESULTS", result_line)
 
+        self.store.save(data)
         await self._refresh_pin(ctx.guild, data)
 
         try:

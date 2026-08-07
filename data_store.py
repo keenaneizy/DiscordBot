@@ -31,6 +31,18 @@ def _default_data() -> dict:
         # cogs/results.py.
         "pending_picks": [],
         "pinned_record": {"channel_id": None, "message_id": None},
+        # One running message per channel per calendar day, listing every
+        # pick/result so far in a compact one-line-per-game format. See
+        # rollup.py. Each slot resets (fresh message, empty lines) the first
+        # time something is posted on a new date.
+        "daily_picks": {
+            "free": {"date": None, "channel_id": None, "message_id": None, "lines": []},
+            "vip": {"date": None, "channel_id": None, "message_id": None, "lines": []},
+        },
+        "daily_results": {
+            "free": {"date": None, "channel_id": None, "message_id": None, "lines": []},
+            "vip": {"date": None, "channel_id": None, "message_id": None, "lines": []},
+        },
         "welcome_posted": False,
         "unit_sizing_posted": False,
     }

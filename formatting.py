@@ -36,10 +36,6 @@ def win_pct(wins: int, losses: int) -> float:
     return round((wins / total) * 100, 1)
 
 
-def _today_str() -> str:
-    return datetime.datetime.now(datetime.timezone.utc).strftime("%b %d, %Y")
-
-
 def _now_str() -> str:
     return datetime.datetime.now(datetime.timezone.utc).strftime("%b %d, %Y %I:%M %p UTC")
 
@@ -173,81 +169,13 @@ def build_record_block(data: dict) -> str:
     return "\n".join(lines)
 
 
-# ── free pick / result ────────────────────────────────────────────────
-def build_free_pick_message(sport_code, away, home, picked, price, probability) -> str:
-    info = config.SPORT_INFO[sport_code]
-    emoji = info["emoji"]
-    return "\n".join([
-        SEP,
-        "👻 PHANTOM PICKS — FREE PICK",
-        SEP,
-        f"📅 Date: {_today_str()}",
-        f"{emoji} Sport: {info['name']}",
-        f"{emoji} Game: {away} @ {home}",
-        SEP,
-        f"🎯 Pick: {picked} {fmt_num(price)}¢",
-        f"📊 Model Probability: {fmt_num(probability)}%",
-        SEP,
-        "⚠️ Not financial advice. Bet responsibly.",
-        f"👻 Follow {config.SOCIAL_HANDLE} for daily picks",
-    ])
+# ── daily rollup lines ──────────────────────────────────────────────────
+# One of these per game gets appended to that day's running picks/results
+# message (see rollup.py) rather than each pick/result getting its own post.
+def build_pick_line(picked: str) -> str:
+    return f"{picked} ML 1u"
 
 
-def build_free_result_message(win: bool, sport_code, away, home, picked, today: dict, overall: dict) -> str:
-    info = config.SPORT_INFO[sport_code]
-    header = "✅ WIN" if win else "❌ LOSS"
-    return "\n".join([
-        SEP,
-        header,
-        SEP,
-        f"📅 {_today_str()}",
-        f"{info['emoji']} {away} @ {home}",
-        f"🎯 Pick: {picked}",
-        SEP,
-        f"📊 Today: {today['wins']}-{today['losses']}",
-        f"📈 Overall: {overall['wins']}-{overall['losses']} — {win_pct(overall['wins'], overall['losses'])}%",
-    ])
-
-
-# ── VIP pick / result ─────────────────────────────────────────────────
-def build_vip_pick_message(sport_code, away, home, picked, price, probability, edge) -> str:
-    info = config.SPORT_INFO[sport_code]
-    emoji = info["emoji"]
-    return "\n".join([
-        SEP,
-        "👻 PHANTOM PICKS — VIP",
-        SEP,
-        f"📅 Date: {_today_str()}",
-        f"{emoji} Sport: {info['name']}",
-        f"{emoji} Game: {away} @ {home}",
-        SEP,
-        f"🎯 Pick: {picked} {fmt_num(price)}¢",
-        f"📊 Model Probability: {fmt_num(probability)}%",
-        f"📈 Edge: +{fmt_num(edge)}pp",
-        SEP,
-        "💰 Recommended Bet: 1 unit",
-        SEP,
-        "⚠️ Not financial advice. Bet responsibly.",
-    ])
-
-
-def build_vip_result_message(win: bool, sport_code, away, home, picked, amount, today: dict,
-                              overall: dict, notes: str) -> str:
-    info = config.SPORT_INFO[sport_code]
-    header = "✅ WIN" if win else "❌ LOSS"
-    result_line = f"💰 Result: +${fmt_money(amount)} profit" if win else f"💰 Result: -${fmt_money(amount)} loss"
-    return "\n".join([
-        SEP,
-        header,
-        "👻 PHANTOM PICKS VIP RESULT",
-        SEP,
-        f"📅 Date: {_today_str()}",
-        f"{info['emoji']} Game: {away} @ {home}",
-        f"🎯 Pick: {picked}",
-        SEP,
-        result_line,
-        f"📊 Today's Record: {today['wins']}-{today['losses']}",
-        f"📈 Running Record: {overall['wins']}-{overall['losses']} — {win_pct(overall['wins'], overall['losses'])}%",
-        SEP,
-        f"🧠 Notes: {notes}",
-    ])
+def build_result_line(picked: str, win: bool) -> str:
+    outcome = "✅" if win else "❌"
+    return f"{picked} ML 1u {outcome}"

@@ -2,8 +2,14 @@
 Picks cog — !freepick and !vippick.
 
 Both commands take quoted arguments for anything that can contain spaces
-(sport names like "College Football", team names, the VIP reason text).
-See !help (cogs/help.py) or README.md for exact syntax and examples.
+(sport names like "College Football", team names). See !help (cogs/help.py)
+or README.md for exact syntax and examples.
+
+Posting: rather than a detailed one-message-per-pick post, each pick gets
+appended as one line ("Team ML 1u") to that channel's single running
+"today's picks" message — see rollup.py. kalshi_price is still required and
+stored on the pending pick even though it's no longer displayed, since
+!result's `auto` amount needs it to calculate P&L/units.
 """
 import discord
 from discord.ext import commands
@@ -11,7 +17,8 @@ from discord.ext import commands
 import config
 from checks import is_admin_or_owner
 from data_store import DataStore
-from formatting import build_free_pick_message, build_vip_pick_message
+from formatting import build_pick_line
+from rollup import append_line
 from sports import resolve_sport
 
 
@@ -51,11 +58,8 @@ class Picks(commands.Cog):
             await ctx.send(f"⚠️ Couldn't find #{config.CH_FREE_PICKS}. Run `!setup` first.")
             return
 
-        message = build_free_pick_message(sport_code, away_team, home_team, picked_team,
-                                           kalshi_price, model_probability)
-        await channel.send(message)
-
         data = self.store.load()
+        await append_line(channel, data["daily_picks"]["free"], "FREE PICKS", build_pick_line(picked_team))
         data["pending_picks"].append({
             "sport": sport_code, "away": away_team, "home": home_team,
             "picked": picked_team, "type": "free", "price": kalshi_price,
@@ -86,11 +90,8 @@ class Picks(commands.Cog):
             await ctx.send(f"⚠️ Couldn't find #{config.CH_VIP_PICKS}. Run `!setup` first.")
             return
 
-        message = build_vip_pick_message(sport_code, away_team, home_team, picked_team,
-                                          kalshi_price, model_probability, edge)
-        await channel.send(message)
-
         data = self.store.load()
+        await append_line(channel, data["daily_picks"]["vip"], "VIP PICKS", build_pick_line(picked_team))
         data["pending_picks"].append({
             "sport": sport_code, "away": away_team, "home": home_team,
             "picked": picked_team, "type": "vip", "price": kalshi_price,

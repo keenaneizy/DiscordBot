@@ -7,17 +7,19 @@ HELP_TEXT = """\
 👻 **PHANTOM PICKS — COMMANDS**
 
 **Pick posting** *(admin only)*
+Picks no longer post as individual detailed messages — each one is appended as a single line ("Team ML 1u") to that channel's one running message for the day (a fresh message starts automatically each new date). `kalshi price`/`model probability`/`edge` are still required since the bot needs the price to calculate results later, even though they're not shown on the line.
+
 `!freepick [sport] [away team] [home team] [picked team] [kalshi price] [model probability]`
-Posts a formatted free pick to #free-daily-picks.
+Adds a line to today's #free-daily-picks message.
 Example: `!freepick MLB "New York Yankees" "Boston Red Sox" "Boston Red Sox" 62 68`
 
 `!vippick [sport] [away team] [home team] [picked team] [kalshi price] [model probability] [edge]`
-Posts a formatted VIP pick to #vip-picks. Recommended bet is always shown as "1 unit" (see `!setunits`/Unit size note below).
+Adds a line to today's #vip-picks message.
 Example: `!vippick MLB "New York Yankees" "Boston Red Sox" "Boston Red Sox" 62 68 6`
 
 **Results & record** *(admin only unless noted)*
 `!result [W|L] [sport] [away team] [home team] [picked team] [amount|auto] [notes]`
-Posts the result to #free-results if that pick came from `!freepick`, or #vip-results if it came from `!vippick` (posts to both only if the pick's origin can't be matched), and updates the pinned model record.
+Adds a line ("Team ML 1u ✅" or "❌") to today's results message — #free-results if that pick came from `!freepick`, or #vip-results if it came from `!vippick` (both only if the pick's origin can't be matched) — and updates the pinned model record. `notes` is still required but no longer shown in the line.
 For `[amount]`, either type a dollar figure yourself, **or type `auto`** to have the bot calculate both the $ profit/loss and the units change automatically from that pick's Kalshi price (assumes a flat 1-unit stake on every game — see `!help` unit size note below). `auto` only works if the sport/teams/picked team match a pick you posted with `!freepick`/`!vippick` exactly.
 Example (auto): `!result W MLB "New York Yankees" "Boston Red Sox" "Boston Red Sox" auto "Bullpen shut the door in the 8th"`
 Example (manual): `!result W MLB "New York Yankees" "Boston Red Sox" "Boston Red Sox" 46 "Bullpen shut the door in the 8th"`
