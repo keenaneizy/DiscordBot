@@ -194,7 +194,12 @@ class ServerSetup(commands.Cog, name="ServerSetup"):
         """Create (and pin) a message if one isn't already stored for this
         data_key, otherwise edit it in place — so editing the template in
         formatting.py actually updates the live message on the next
-        startup/!setup, instead of only affecting brand-new servers."""
+        startup/!setup, instead of only affecting brand-new servers.
+
+        Also self-heals duplicates: if any *other* message authored by the
+        bot is also pinned in this channel (e.g. a stale one left over from
+        before this tracking existed, or from a data reset), it gets
+        unpinned and deleted so there's only ever one."""
         data = self.store.load()
         pin_info = data.get(data_key, {})
         message = None
@@ -216,6 +221,19 @@ class ServerSetup(commands.Cog, name="ServerSetup"):
             log.info(f"Posted + pinned {data_key}")
         else:
             await message.edit(content=content)
+
+        try:
+            pins = await channel.pins()
+        except discord.HTTPException:
+            pins = []
+        for pinned in pins:
+            if pinned.author.id == channel.guild.me.id and pinned.id != message.id:
+                try:
+                    await pinned.unpin(reason="Phantom Picks: removing duplicate pinned message")
+                    await pinned.delete()
+                    log.info(f"Removed duplicate pinned message in #{channel.name}")
+                except discord.HTTPException:
+                    pass
 
     async def sync_record_pin(self, record_channel: discord.TextChannel):
         """Create (and pin) the model record message if it doesn't exist yet,
