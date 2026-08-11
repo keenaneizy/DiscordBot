@@ -31,6 +31,12 @@ def _default_data() -> dict:
         # cogs/results.py.
         "pending_picks": [],
         "pinned_record": {"channel_id": None, "message_id": None},
+        # Pinned once and then kept in sync (edited in place) on every
+        # startup/!setup — so an edit to build_welcome_message()/
+        # build_unit_sizing_message() in formatting.py actually shows up
+        # live instead of only affecting brand-new servers.
+        "pinned_welcome": {"channel_id": None, "message_id": None},
+        "pinned_unit_sizing": {"channel_id": None, "message_id": None},
         # One running message per channel per calendar day, listing every
         # pick/result so far in a compact one-line-per-game format. See
         # rollup.py. Each slot resets (fresh message, empty lines) the first
@@ -43,8 +49,6 @@ def _default_data() -> dict:
             "free": {"date": None, "channel_id": None, "message_id": None, "lines": []},
             "vip": {"date": None, "channel_id": None, "message_id": None, "lines": []},
         },
-        "welcome_posted": False,
-        "unit_sizing_posted": False,
     }
 
 

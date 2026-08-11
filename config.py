@@ -14,8 +14,8 @@ COMMAND_PREFIX = "!"
 # commands without this being set — see checks.py.
 BOT_OWNER_ID = os.getenv("BOT_OWNER_ID")
 
-# Replace with your real Phantom Pro upgrade link (or set WINIBLE_LINK in .env)
-WINIBLE_LINK = os.getenv("WINIBLE_LINK", "https://winible.com")
+# Phantom Pro upgrade link (override via WINIBLE_LINK in .env if it changes)
+WINIBLE_LINK = os.getenv("WINIBLE_LINK", "https://www.winible.com/phantompicks1")
 
 SOCIAL_HANDLE = "@phantompicks"
 

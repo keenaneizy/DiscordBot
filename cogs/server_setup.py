@@ -179,56 +179,53 @@ class ServerSetup(commands.Cog, name="ServerSetup"):
 
     # ── pinned messages ──────────────────────────────────────────────────
     async def _post_pinned_info_messages(self, channels: dict):
-        data = self.store.load()
-
-        if not data.get("welcome_posted"):
-            msg = await channels["welcome"].send(build_welcome_message())
-            try:
-                await msg.pin(reason="Phantom Picks welcome message")
-            except discord.HTTPException:
-                pass
-            data["welcome_posted"] = True
-            self.store.save(data)
-            log.info("Posted + pinned welcome message")
-
-        if not data.get("unit_sizing_posted"):
-            msg = await channels["unit_sizing"].send(build_unit_sizing_message())
-            try:
-                await msg.pin(reason="Phantom Picks responsible betting message")
-            except discord.HTTPException:
-                pass
-            data["unit_sizing_posted"] = True
-            self.store.save(data)
-            log.info("Posted + pinned unit sizing message")
-
+        await self._sync_pinned_message(
+            channels["welcome"], "pinned_welcome", build_welcome_message(),
+            "Phantom Picks welcome message",
+        )
+        await self._sync_pinned_message(
+            channels["unit_sizing"], "pinned_unit_sizing", build_unit_sizing_message(),
+            "Phantom Picks responsible betting message",
+        )
         await self.sync_record_pin(channels["record"])
+
+    async def _sync_pinned_message(self, channel: discord.TextChannel, data_key: str,
+                                    content: str, pin_reason: str):
+        """Create (and pin) a message if one isn't already stored for this
+        data_key, otherwise edit it in place — so editing the template in
+        formatting.py actually updates the live message on the next
+        startup/!setup, instead of only affecting brand-new servers."""
+        data = self.store.load()
+        pin_info = data.get(data_key, {})
+        message = None
+
+        if pin_info.get("message_id"):
+            try:
+                message = await channel.fetch_message(pin_info["message_id"])
+            except (discord.NotFound, discord.HTTPException):
+                message = None
+
+        if message is None:
+            message = await channel.send(content)
+            try:
+                await message.pin(reason=pin_reason)
+            except discord.HTTPException:
+                pass
+            data[data_key] = {"channel_id": channel.id, "message_id": message.id}
+            self.store.save(data)
+            log.info(f"Posted + pinned {data_key}")
+        else:
+            await message.edit(content=content)
 
     async def sync_record_pin(self, record_channel: discord.TextChannel):
         """Create (and pin) the model record message if it doesn't exist yet,
         otherwise edit it in place. Called on startup and after every command
         that changes the record (!result, !updaterecord, !setrecord, !setunits)."""
         data = self.store.load()
-        pin_info = data.get("pinned_record", {})
-        message = None
-
-        if pin_info.get("message_id"):
-            try:
-                message = await record_channel.fetch_message(pin_info["message_id"])
-            except (discord.NotFound, discord.HTTPException):
-                message = None
-
-        content = build_record_block(data)
-
-        if message is None:
-            message = await record_channel.send(content)
-            try:
-                await message.pin(reason="Phantom Picks model record")
-            except discord.HTTPException:
-                pass
-            data["pinned_record"] = {"channel_id": record_channel.id, "message_id": message.id}
-            self.store.save(data)
-        else:
-            await message.edit(content=content)
+        await self._sync_pinned_message(
+            record_channel, "pinned_record", build_record_block(data),
+            "Phantom Picks model record",
+        )
 
     # ── backfill ─────────────────────────────────────────────────────────
     async def _backfill_free_role(self, guild: discord.Guild, free_role: discord.Role):
