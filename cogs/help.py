@@ -17,6 +17,10 @@ Example: `!freepick MLB "New York Yankees" "Boston Red Sox" "Boston Red Sox" 62`
 Adds a line to today's #vip-picks message.
 Example: `!vippick MLB "New York Yankees" "Boston Red Sox" "Boston Red Sox" 62`
 
+`!editpick [sport] [away team] [home team] [old picked team] [new picked team]`
+Fixes a wrong/typo'd picked team on a pick you already posted — corrects the tracked pick (so `!result auto` still matches it) and edits the line in today's live rollup message. This is the only way to fix it, since you can't hand-edit the bot's own message in Discord.
+Example: `!editpick MLB "Milwaukee Brewers" "San Diego Padres" "Milwaukee Brewers" "San Diego Padres"`
+
 **Results & record** *(admin only unless noted)*
 `!result [W|L] [sport] [away team] [home team] [picked team] [amount|auto] [notes]`
 Adds a line ("Team ML 1u ✅" or "❌") to today's results message — #free-results if that pick came from `!freepick`, or #vip-results if it came from `!vippick` (both only if the pick's origin can't be matched) — and updates the pinned model record. `notes` is still required but no longer shown in the line.

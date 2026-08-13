@@ -108,6 +108,7 @@ have one pinned message.
 |---|---|---|
 | `!freepick [sport] [away] [home] [picked] [kalshi price]` | admin | Adds a "Team ML 1u" line to today's running #free-daily-picks message |
 | `!vippick [sport] [away] [home] [picked] [kalshi price]` | admin | Adds a "Team ML 1u" line to today's running #vip-picks message |
+| `!editpick [sport] [away] [home] [old picked] [new picked]` | admin | Fixes a wrong/typo'd picked team on an already-posted pick — corrects tracking and edits today's rollup message line |
 | `!result [W\|L] [sport] [away] [home] [picked] [amount\|auto] [notes]` | admin | Adds a "Team ML 1u ✅/❌" line to today's running #free-results or #vip-results message (matching the pick's origin), updates the pinned record |
 | `!updaterecord [W\|L] [sport]` | admin | Manually adjusts overall + sport record only |
 | `!setrecord [W-L]` | admin | Manually overwrites the overall record, e.g. `!setrecord 45-30` |
